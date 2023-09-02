@@ -87,3 +87,15 @@ git 删除某个提交
         git unstash             # 取出代码
         git commit              # 重新提交代码
         git push -f             # 强制推送到远程
+
+从Github一次性克隆所有的仓库
+============================
+
+   .. prompt:: bash
+
+        gh auth login
+
+        gh repo list xilinx --limit 1000 | while read -r repo _; do
+            gh repo clone "$repo" "$repo"
+        done
+

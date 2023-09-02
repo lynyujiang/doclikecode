@@ -8,20 +8,26 @@ Welcome to 我的笔记's documentation!
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :hidden:
+   :caption: 🚀 Linux
 
    debian.rst
-   git.rst
    linux.rst
+
+.. toctree::
+   :maxdepth: 2
+   :hidden:
+   :caption: 💡 Command
+
+   git.rst
    python.rst
    reStructuredText.rst
    url.rst
    vim.rst
+
+.. toctree::
+   :maxdepth: 2
+   :hidden:
+   :caption: 📚 Zynq
+
    zynq.rst
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
