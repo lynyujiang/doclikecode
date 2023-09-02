@@ -12,16 +12,16 @@ Git添加多个远程仓库
 
 #. 查看有多少个仓库
 
-.. code-block:: console
+    .. code-block:: console
 
-   git remote -v
+        git remote -v
 
 #. 添加github远程仓库
 
-.. code-block:: console
+    .. code-block:: console
 
-   git remote add github https://github.com/lynyujiang/doclikecode.git
-   git push -u github master
+    git remote add github https://github.com/lynyujiang/doclikecode.git
+    git push -u github master
 
 #. 添加gitee远程仓库
 
