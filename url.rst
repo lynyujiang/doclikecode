@@ -31,6 +31,8 @@
 搞学习
 ======
 
+* 学府图书馆: http://www.xueshu5688.com/
+
 * TED(最优质的演讲): https://www.ted.com/
 * 谷粉学术: https://gfsoso.99lb.net/scholar.html
 * 大学资源网: https://www.dxzy163.com/

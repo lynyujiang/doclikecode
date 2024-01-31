@@ -19,10 +19,13 @@ Welcome to 我的笔记's documentation!
    :hidden:
    :caption: 💡 Command
 
+   altera.rst
+   bash.rst
    git.rst
    python.rst
    reStructuredText.rst
    url.rst
+   mirrors.rst
    vim.rst
 
 .. toctree::

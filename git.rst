@@ -5,6 +5,8 @@ Hello Git
 
 * Github: https://github.com
 * GitHub文档: https://docs.github.com/zh
+* Git 教程: https://deepinout.com/git/git-tutorial/00_git_tutorial.html
+* 持续集成和持续开发（CI/CD）: https://www.imangodoc.com/191099.html
 
 
 Git添加多个远程仓库
@@ -91,7 +93,7 @@ git 删除某个提交
 从Github一次性克隆所有的仓库
 ============================
 
-   .. prompt:: bash
+   .. code-block:: bash
 
         gh auth login
 
@@ -102,7 +104,7 @@ git 删除某个提交
 在docker中运行gitlab
 ====================
 
-   .. prompt:: bash
+   .. code-block:: bash
 
         docker run -d                      \
             --name gitlab                  \
@@ -114,10 +116,6 @@ git 删除某个提交
             -v ${PWD}/logs:/var/log/gitlab \
             -v ${PWD}/data:/var/opt/gitlab \
             gitlab/gitlab-ce
-
---name           指定窗口的名称
---restart always 出现异常后自动重启
--p               端口映射
 
 
 git cherry-pick
@@ -173,7 +171,7 @@ $ git cherry-pick A^..B
 
 
 撤消工作区的修改（尚未进行git add操作）
-======================================
+=======================================
 
 因为还没执行git add命令添加到暂存区，所以只需要通过git checkout -- index.html来撤消index.html的修改。
 
@@ -183,7 +181,7 @@ $ git chekcout -- .             # 撤消所有修改的文件
 注意：一定要加--，不加就是切换分支了。
 
 撤消暂存区的修改（已经执行git add，但未执行git commit）
-======================================================
+=======================================================
 
 如果不幸通过git add提交到了暂存区，则需要通过git reset来撤消。
 
@@ -193,7 +191,7 @@ $ git reset HEAD .              # 撤消所有的文件
 注意：这里只是撤消暂存区的修改，所以工作目录看上去是没有任何变化的。
 
 撤消本地仓库中的修改（已经执行git commit，但未执行git push）
-===========================================================
+============================================================
 
 查看下提交记录。
 
@@ -227,7 +225,7 @@ git reset --soft
 回退到指定版本，工作区和暂存区的内容会被保留。比如在上一次commit后，新增了a.html文件并且add到暂存区，同时修改了b.html文件，没有add提交，那么在使用git reset --soft后，暂存区和工作区的内容还在，工作区对b.html文件的修改会保留，同时a.html也在暂存区中，如果需要再提交，直接git commmit就行
 
 撤消远程仓库的修改（已经执行git push）
-=====================================
+======================================
 
 使用git reset回滚时直接删除指定版本后的提交记录，使用git log看不到后面的记录（如果需要看到回滚前的版本，可以使用git reflog）。
 
@@ -257,7 +255,7 @@ $ git reset --hard origin/master    # 使用远程的master分支直接覆盖本
 $ git log
 
 查看当前操作信息（主要可以查看对应版本的ID）
-===========================================
+============================================
 
 $ git reflog
 
@@ -311,4 +309,102 @@ docker run                                   \
 
 使用管理员密码进行登录，可以使用以下命令从容器启动日志中获取管理密码：
 docker logs jenkins
+
+配置工具
+========
+
+对所有本地仓库的用户信息进行配置
+
+.. code-block:: bash
+
+    # 对你的commit操作设置关联的用户名
+    git config --global user.name "[name]"
+
+    # 对你的commit操作设置关联的邮箱地址
+    git config --global user.email "[email address]"
+
+    # 启用有帮助的彩色命令行输出
+    git config --global color.ui auto
+
+分支
+====
+
+分支是使用git工作的一个重要部分。你做的任何提交都会发生在当前“checked out“到的分支上。使用git status查看是哪个分支。
+
+.. code-block:: bash
+
+    # 创建一个新分支
+    git branch [branch-name]
+
+    # 切换到指定的分支并更新工作目录（working directory）
+    git switch -c [branch-name]
+
+    # 将指定分支的历史合并到当前分支。这通常在拉取请求（PR）中完成，但也是一个重要的git操作。
+    git merge [branch]
+
+    # 删除指定分支
+    git branch -d [branch-name]
+
+进行更改
+========
+
+浏览并检查项目文件的发展
+
+.. code-block:: bash
+
+    # 列出当前分支的版本历史
+    git log
+
+    # 列出文件的版本历史，包括重命名
+    git log --follow [file]
+
+    # 展示两个分支之间的内容差异
+    git diff [first-branch]...[second-branch]
+
+    # 输出指定commit的元数据和内容变化
+    git show [commit]
+
+    # 将文件进行快照处理，用于版本控制
+    git add [file]
+
+    # 将文件快照永久地记录在版本历史中
+    git commit -m "[descriptive message]"
+
+重做提交
+========
+
+清除错误和构建用于替换的历史
+
+.. code-block:: bash
+
+    # 撤消所有的[commit]后的提交，在本地保存更改
+    git reset [commit]
+
+    # 放弃所有历史，改回指定提交
+    git reset --hard [commit]
+
+.gitignore 文件
+===============
+
+有时一些文件最好不要用git跟踪。这通常在名为.gitignore的特殊文件中完成。你可以在github.com/github/gitignore找到有用的.gitignore文件模板。
+
+同步更改
+========
+
+将你本地仓库与github.com上的远端仓库同步
+
+.. code-block:: bash
+
+    # 下载远端跟踪分支的所有历史
+    git fetch
+
+    # 将远端跟踪分支合并到当前的本地分支
+    git merge
+
+    # 将所有本地分支提交上传到github
+    git push
+
+    # 使用来自github的对应远端分支的所有新提交更新到你当前的本地工作分支。git pull是git fetch和git merge的结合
+    git pull
+
 
