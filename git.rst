@@ -101,23 +101,6 @@ git 删除某个提交
             gh repo clone "$repo" "$repo"
         done
 
-在docker中运行gitlab
-====================
-
-   .. code-block:: bash
-
-        docker run -d                      \
-            --name gitlab                  \
-            --restart always               \
-            -p 8443:443                    \
-            -p 9000:9000                   \
-            -p 8022:22                     \
-            -v ${PWD}/config:/etc/gitlab   \
-            -v ${PWD}/logs:/var/log/gitlab \
-            -v ${PWD}/data:/var/opt/gitlab \
-            gitlab/gitlab-ce
-
-
 git cherry-pick
 ===============
 
@@ -406,5 +389,34 @@ docker logs jenkins
 
     # 使用来自github的对应远端分支的所有新提交更新到你当前的本地工作分支。git pull是git fetch和git merge的结合
     git pull
+
+在docker中运行gitlab
+====================
+
+   .. code-block:: bash
+
+        docker run -d                      \
+            --name gitlab                  \
+            --restart always               \
+            -p 8443:443                    \
+            -p 9000:9000                   \
+            -p 8022:22                     \
+            -v ${PWD}/config:/etc/gitlab   \
+            -v ${PWD}/logs:/var/log/gitlab \
+            -v ${PWD}/data:/var/opt/gitlab \
+            gitlab/gitlab-ce
+
+
+gitlab 修改时区
+===============
+
+.. code-block:: bash
+
+    sudo tee -a etc/gitlab.rb > /dev/null <<EOF
+    gitlab_rails['time_zone'] = 'Asia/Shanghai'
+    EOF
+
+    sudo docker restart gitlab
+
 
 

@@ -11,6 +11,42 @@ Shebang 行有几个优点，比如允许用户把脚本和文件当作命令，
 
 "#!/bin/false" 指令是一个特殊的shebang指令，它立即退出并返回一个错误的状态，防止某些系统文件在其适当的上下文之外运行。
 
+Check if a shell script running as non-root user
+================================================
+
+.. code-block:: bash
+
+    if [ "$EUID" -eq 0 ]; then
+        echo "Please run this script as a non-root user"
+        exit 1
+    fi
+
+Check if a shell script running as root user
+============================================
+
+.. code-block:: bash
+
+    if [ "$(id -u)" != "0" ]; then
+        echo Please run this script as root or using sudo
+        exit 1
+    fi
+
+    if [[ $EUID -ne 0 ]]; then
+        echo Please run this script as root or using sudo
+        exit 1
+    fi
+
+    if [ "$(id -un)" != "root" ]; then
+        echo Please run this script as root or using sudo
+        exit 1
+    fi
+
+    if [ "$(whoami)" != "root" ]; then
+        echo Please run this script as root or using sudo
+        exit 1
+    fi
+
+
 Run the Last Command as Root
 ============================
 
@@ -19,6 +55,190 @@ Run the Last Command as Root
     sudo !!
 
     su -c "!!"
+
+Append Text to a File Using Sudo
+================================
+
+.. code-block:: bash
+
+    echo text | sudo tee -a file
+
+Add root privileges to bash script
+==================================
+
+.. code-block:: bash
+
+    ## Lab1
+    echo <password> | sudo -s <scriptname.sh>
+
+    ## Lab2
+    foo1  # runs normally
+
+    sudo bash <<EOF
+    bar1  # runs as if with sudo
+    bar2  # runs as if with sudo
+    EOF
+
+    foo2  # runs normally
+
+Run Command As Another User
+===========================
+
+.. code-block:: bash
+
+    # Lab1
+    #!/bin/bash
+
+    if [ "$(whoami)" != "root" ]; then
+        sudo -u root bash "$0" "$@"
+        exit
+    fi
+
+    whoami
+
+
+    # Lab2
+    sudo -u root whoami
+
+    # Lab3
+    sudo -H -u root bash -c whoami
+
+    # Lab4
+    ssh root@localhost whoami
+
+Bash add pause prompt in a shell script
+=======================================
+
+.. code-block:: bash
+
+    # Lab1
+    function pause() {
+        read -p "$*"
+    }
+
+    pause 'Press [Enter] key to continue...'
+
+    # Lab2
+    read -t 15 -N 1 -p "Continue (y/N)? " answer
+
+    # if answer is yes within 15 seconds
+    if [ "${answer,,}" == "y" ]; then
+        "command"
+    fi
+
+    # Lab3
+    read -t 10 "Sleeping with 10 seconds time out ..."
+
+    # Lab4
+    echo "Sleeping with 10 seconds time out ..." && sleep 10
+
+Create few users without password using
+=======================================
+
+.. code-block:: bash
+
+    sudo adduser --gecos "" --disabled-password --no-create-home user1
+    sudo adduser --gecos "" --disabled-password --no-create-home user2
+
+Automating user management with bash script
+===========================================
+
+.. code-block:: bash
+    # https://dev.to/karnatisrinivas/automating-user-management-with-bash-script-46ie
+
+    # create a file servers.txt that includes the servers names:
+    root@158.89.175.250
+    root@165.22.222.248
+
+    # take a look at the following addusers.sh bash script:
+    #!/bin/bash
+    servers=$(cat servers.txt)
+    echo -n "Enter the username: "
+    read userName
+    echo -n "Enter the user id: "
+    read userID
+
+    for i in $servers; do
+        echo $i
+        ssh $i "sudo useradd -m -u $userID $userName"
+        if [ $? -eq 0 ]; then
+            echo "User $userName added on $i"
+        else
+            echo "Error on $i"
+        fi
+    done
+
+Use a Shell Script to Send an Email
+===================================
+
+.. code-block:: bash
+
+    # Use sendmail command
+    sendmail user@example.com < mail.txt
+
+    # Use mutt command
+    sudo apt-get install mutt
+    echo "Test Email" | mutt -s "Test Email" user@example.com
+
+Monitoring available disk space
+===============================
+
+.. code-block:: bash
+
+    #!/bin/bash
+    # https://linuxhandbook.com/bash-automation/
+
+    filesystems=("/" "/apps" "/database")
+    for i in ${filesystems[@]}; do
+        usage=$(df -h $i | tail -n 1 | awk '{print $5}' | cut -d % -f1)
+        if [ $usage -ge 90 ]; then
+            alert="Running out of space on $i, Usage is: $usage%"
+            echo "Sending out a disk space alert email."
+            echo $alert | mail -s "$i is $usage% full" your_email
+        fi
+    done
+
+Automating backups with bash script
+===================================
+
+.. code-block:: bash
+
+    #!/bin/bash
+    # https://linuxhandbook.com/bash-automation/
+
+    backup_dirs=("/etc" "/home" "/boot")
+    dest_dir="/backup"
+    dest_server="server1"
+    backup_date=$(date +%b-%d-%y)
+
+    echo "Starting backup of: ${backup_dirs[@]}"
+
+    for i in "${backup_dirs[@]}"; do
+        sudo tar -Pczf /tmp/$i-$backup_date.tar.gz $i
+        if [ $? -eq 0 ]; then
+            echo "$i backup succeeded."
+        else
+            echo "$i backup failed."
+        fi
+        scp /tmp/$i-$backup_date.tar.gz $dest_server:$dest_dir
+        if [ $? -eq 0 ]; then
+            echo "$i transfer succeeded."
+        else
+            echo "$i transfer failed."
+        fi
+    done
+
+    sudo rm /tmp/*.gzecho "Backup is done."
+
+
+Passing the contents of file as a command line argument
+=======================================================
+
+.. code-block:: bash
+
+    scriptname.sh "$(<filename)"
+
+
 
 Clear Your Shell History
 ========================
@@ -33,13 +253,6 @@ Use Vim to Edit Files over the Network
 .. code-block:: bash
 
     vim scp://remote-user@remote-host//parth/to/file
-
-Append Text to a File Using Sudo
-================================
-
-.. code-block:: bash
-
-    echo text | sudo tee -a file
 
 Change the Case of a String
 ===========================
@@ -698,9 +911,41 @@ Note that `[[` is actually a command/program that returns either `0` (true) or `
 +-------------------------+--------------------------+
 
 
+Check if a file exists
+======================
 
+.. code-block:: bash
 
+    #!/bin/bash
 
+    File=/etc/passwd
+
+    if [ -f "$File" ]; then
+        echo "$File exists"
+    fi
+
+Multi-line Comments
+===================
+
+.. code-block:: bash
+
+    #!/bin/bash
+    << 'COMMENT'
+        We have a multiline comment,
+        We can use it anywhere.
+    COMMENT
+
+Iterate over associative arrays
+===============================
+
+.. code-block:: bash
+
+    #!/bin/bash
+    declare -A arr=(["Paris"]="France" ["Vienna"]="Austria" ["Oslo"]="Norway")
+    for i in ${!arr[@]}
+    do
+        echo $i:${arr[$i]}      # key:value
+    done
 
 
 
